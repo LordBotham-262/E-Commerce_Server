@@ -9,6 +9,8 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 
 var mysql = require('mysql');
 var connection = mysql.createConnection({
@@ -52,7 +54,24 @@ app.route('/product/category_id/:categoryId/product_id/:productId')
            res.send(results);
          }
        });
-    });
+    })
+  .post(bodyParser.json(),(function(req,res){
+        req.body.cartItems.forEach((item, i) => {
+        connection.query('INSERT INTO cart_items (product_id,user_id,size,quantity) VALUES (?,?,?,?)',[item.product_id,req.params.userId,item.size,item.quantity],function(error,results,fields){
+          if (error) throw res.send(error);
+          else {
+            console.log("Items inserted successfully");
+            message = {
+                        "success": true,
+                        "payload": "Cart updated for the user",
+                        "user_id":  req.params.userId
+                      }
+            res.send(message);
+
+          }
+           });
+         });
+    }));
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
