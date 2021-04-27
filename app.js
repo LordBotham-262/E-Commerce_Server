@@ -1,10 +1,11 @@
 //jshint esversion:6
 
 const express = require("express");
+const app = express();
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 var _ = require('lodash');
-const app = express();
+
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -27,7 +28,7 @@ app.use('/product_type',productTypesRoutes);
 app.use('/cart/user_id',cartItemsRoutes);
 
 app.use((req,res,next) => {
-  const error = new Error('Not Found');
+  const error = new Error('404 Not Found');
   error.status = 404 ;
   next(error);
 })
