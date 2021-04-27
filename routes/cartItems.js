@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const router = express.Router();
 var connection = require('./../database/serverConnector');
+var Q = require("q");
 
 router.get('/:userId', (req, res, next) => {
   connection.query('SELECT * FROM cart_items AS c INNER JOIN product AS p ON c.product_id = p.id WHERE user_id = ?', [req.params.userId], function(error, results, fields) {
@@ -14,9 +15,22 @@ router.get('/:userId', (req, res, next) => {
 });
 
 
-router.post('/:userId', (req, res, next) => {
-  app.use(userValidate([req.params.userId]))
-  .catch (console.log(error))
+router.post('/:userId', userValidate, (req, res, next) => {
+let xyz;
+  req.body.cartItems.forEach((item, i) => {
+    xyz = productValidate(item, req, res, next)
+    .then(console.log(xyz));
+  });
+
+  // if (xyz) {
+  //   res.status(201).json({
+  //     message: 'Items added to cart for User ' + req.params.userId
+  //   });
+  // }
+
+  // res.status(201).json({
+  //   message: 'Items added to cart for User ' + req.params.userId
+  // });
   // try {
   //   connection.query('SELECT * from user where id = ?', [req.params.userId], function(error, user, fields) {
   //     if (error) {
@@ -64,28 +78,51 @@ router.post('/:userId', (req, res, next) => {
 });
 
 
-userValidate = function(id) {
-  connection.query('SELECT * from user where id = ?', id, function(error, user, fields) {
-    if (error) throw error;
-    else {
+function userValidate(req, res, next) {
+  connection.query('SELECT * from user where id = ?', [req.params.userId], function(error, user, fields) {
+    if (error) {
+      res.status(500).json({
+        message: error.sqlMessage
+      });
+
+    } else {
       if (user.length == 0) {
-        throw "User not found";
-      }
+        res.status(404).json({
+          message: 'User not found with ID ' + req.params.userId
+        });
+      } else next();
     }
   })
 }
 
-productValidate = function(id) {
-  connection.query('SELECT * from product where id = ?', id, function(error, product, fields) {
-    if (error) throw error;
-    else {
+async function productValidate(item, req, res, next) {
+  let productValidation;
+  connection.query('SELECT * from product where id = ?', [item.product_id], function(error, product, fields) {
+    if (error) {
+      res.status(500).json({
+        message: error.sqlMessage
+      });
+    } else {
       if (product.length == 0) {
         res.status(404).json({
-          message: 'Product not found for ID ' + item.product_id
+          message: 'Product not found with ID ' + item.product_id
         });
-      }
+        productValidation = false;
+      } else {
+        connection.query('INSERT INTO cart_items (product_id,user_id,size,quantity) VALUES (?,?,?,?)', [item.product_id, req.params.userId, item.size, item.quantity], function(error, results, fields) {
+          if (error) {
+            res.status(500).json({
+              message: error.sqlMessage
+            });
+          } else {
+            console.log("Items inserted successfully");
+            productValidation =  true;
+          }
+        })
+      };
     }
   })
+  return productValidation;
 }
 
 

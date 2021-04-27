@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 var _ = require('lodash');
 
-
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -16,6 +15,7 @@ app.use(express.urlencoded({
   extended: true
 }));
 app.use(express.json());
+
 
 var connection = require('./database/serverConnector');
 
