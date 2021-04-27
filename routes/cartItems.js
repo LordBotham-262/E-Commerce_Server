@@ -16,12 +16,9 @@ router.get('/:userId', (req, res, next) => {
 
 
 router.post('/:userId', userValidate, (req, res, next) => {
-  req.body.cartItems.forEach((item, i) => {
-    productValidate(item, req, res, next)
-      .then(function(data) {
-        console.log(data);
-        //next();
-      });
+  multipleProductValidation(req, res, next).then(function(data) {
+    res.end();
+    console.log('stopping the res')
   });
 });
 
@@ -43,9 +40,22 @@ function userValidate(req, res, next) {
   })
 }
 
+function multipleProductValidation(req, res, next){
+  return new Promise(function(resolve, reject) {
+    req.body.cartItems.forEach((item, i) => {
+      productValidate(item, req, res, next)
+        .then(function(data) {
+          resolve(data);
+          console.log('validated object');
+          //next();
+        });
+    })
+  }
+  )}
+
+
 function productValidate(item, req, res, next) {
   return new Promise(function(resolve, reject) {
-    let productValidation;
     connection.query('SELECT * from product where id = ?', [item.product_id], function(error, product, fields) {
       if (error) {
         res.status(500).json({
@@ -56,7 +66,7 @@ function productValidate(item, req, res, next) {
           res.status(404).json({
             message: 'Product not found with ID ' + item.product_id
           });
-          productValidation = false;
+          resolve(false);
         } else {
           connection.query('INSERT INTO cart_items (product_id,user_id,size,quantity) VALUES (?,?,?,?)', [item.product_id, req.params.userId, item.size, item.quantity], function(error, results, fields) {
             if (error) {
@@ -64,17 +74,15 @@ function productValidate(item, req, res, next) {
                 message: error.sqlMessage
               });
             } else {
-              console.log("Items inserted successfully");
-              productValidation = true;
+              res.status(201).write('Items added to cart for User ' + req.params.userId);
+              resolve(true)
             }
           })
         };
       }
     })
-    resolve(productValidation) ;
   });
 }
-
 
 module.exports = router;
 
