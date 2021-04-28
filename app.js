@@ -23,6 +23,10 @@ const productRoutes = require('./routes/products');
 const productTypesRoutes = require('./routes/product_types');
 const cartItemsRoutes = require('./routes/cartItems');
 
+app.get('/',(req, res, next) => {
+  res.send("Hello world");
+});
+
 app.use('/products',productRoutes);
 app.use('/product_type',productTypesRoutes);
 app.use('/cart/user_id',cartItemsRoutes);
