@@ -16,7 +16,6 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 
-
 var connection = require('./database/serverConnector');
 
 const productRoutes = require('./routes/products');
