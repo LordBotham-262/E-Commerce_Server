@@ -1,10 +1,14 @@
+require('dotenv').config();
+
 var mysql = require('mysql');
+console.log(process.env.host);
+
 var connection  = mysql.createConnection({
-  host: process.env.host || 'localhost',
-  port: process.env.port || '3306',
-  user: process.env.user || 'root',
-  password: process.env.password || 'root',
-  database: process.env.databse || 'patel_'
+  host: process.env.host ,
+  port: process.env.port,
+  user: process.env.user,
+  password: process.env.password,
+  database: process.env.databse
 });
 
 //connection.connect();
