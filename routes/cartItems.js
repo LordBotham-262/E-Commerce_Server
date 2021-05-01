@@ -13,7 +13,6 @@ router.get('/:userId', (req, res, next) => {
   });
 });
 
-
 router.post('/:userId', userValidate, (req, res, next) => {
  multipleProductValidation(req, res, next)
   .then(function(data) {
@@ -28,11 +27,11 @@ router.post('/:userId', userValidate, (req, res, next) => {
   );
 });
 
-router.delete('/:userId/product_id/:productId',userValidate, (req,res,next) => {
-  connection.query('delete from cart_items where (user_id = ? or ? = 0) and (product_id = ? or ?  = 0)', [req.params.userId,req.params.userId,req.params.productId, req.params.productId], function(error, results, fields) {
+router.delete('/:userId/cart_id/:cartId',userValidate, (req,res,next) => {
+  connection.query('delete from cart_items where user_id = ?  and (cart_id = ? or ?  = 0)', [req.params.userId,req.params.cartId, req.params.cartId], function(error, results, fields) {
     if (error) res.status(500).send(error.sqlMessage);
     else {
-      console.log("Item deleted from cart for User" + req.params.userId);
+      console.log("Item " + req.params.cartId +" deleted from cart for User" + req.params.userId);
       res.status(200).send(results);
     }
   });
@@ -50,7 +49,6 @@ router.put('/:userId', userValidate, (req, res, next) => {
     message : error
   }));
   });
-
 
 function userValidate(req, res, next) {
   connection.query('SELECT * from user where id = ?', [req.params.userId], function(error, user, fields) {
@@ -106,7 +104,6 @@ function cartItemUpdation(item, req, res, next) {
       })
     });
   }
-
 
 function multipleCartItemUpdation( req, res, next){
     return new Promise(function(resolve, reject) {
