@@ -14,10 +14,15 @@ router.get('/:userId', (req, res, next) => {
 });
 
 router.post('/:userId', userValidate, (req, res, next) => {
- multipleProductValidation(req, res, next)
+  multipleProductInCartValidation(req, res, next)
   .then(function(data) {
-    res.status(201).json({
-      message: "Added all products to the cart"
+    console.log("reached here");
+    connection.query('SELECT sum(quantity) as cartCount FROM cart_items where user_id = ?', [req.params.userId], function(error, results, fields) {
+      if (error) res.status(500).send(error.sqlMessage);
+      else {
+        console.log(results);
+        res.status(201).send(results);
+      }
     });
   })
   .catch(error =>
@@ -32,23 +37,16 @@ router.delete('/:userId/cart_id/:cartId',userValidate, (req,res,next) => {
     if (error) res.status(500).send(error.sqlMessage);
     else {
       console.log("Item " + req.params.cartId +" deleted from cart for User" + req.params.userId);
-      res.status(200).send(results);
+      connection.query('SELECT sum(quantity) as cartCount FROM cart_items where user_id = ?', [req.params.userId], function(error, results, fields) {
+        if (error) res.status(500).send(error.sqlMessage);
+        else {
+          console.log(results);
+          res.status(200).send(results);
+        }
+      });
     }
   });
 });
-
-router.put('/:userId', userValidate, (req, res, next) => {
-    multipleCartItemUpdation(req, res, next)
-    .then(function(data){
-      res.status(201).json({
-        messgage : "Updated all items for User"
-      })
-    })
-  .catch(error =>
-  res.status(500).js0n({
-    message : error
-  }));
-  });
 
 function userValidate(req, res, next) {
   connection.query('SELECT * from user where id = ?', [req.params.userId], function(error, user, fields) {
@@ -67,29 +65,26 @@ function userValidate(req, res, next) {
   })
 }
 
-function multipleProductValidation(req, res, next){
+function multipleProductInCartValidation(req, res, next){
  return new Promise(function(resolve, reject) {
-   let promiseArr = req.body.cartItems.map(item => productValidate(item, req, res, next))
+   let promiseArr = req.body.cartItems.map(item => productInCartValidate(item, req, res, next))
    Promise.all(promiseArr).then(values => resolve(values)).catch(error =>reject(error))
  }
  )}
 
-function productValidate(item, req, res, next) {
+function productInCartValidate(item, req, res, next) {
   return new Promise(function(resolve, reject) {
-    connection.query('SELECT * from product where id = ?', [item.product_id], function(error, product, fields) {
+    connection.query('SELECT * FROM cart_items where user_id = ? and product_id = ? and size = ?', [req.params.userId,item.product_id, item.size], function(error, product, fields) {
+      console.log("cart item checking");
       if (error) {
         reject(error.sqlMessage)
       } else {
         if (product.length == 0) {
-            reject('Product not found with ID ' + item.product_id)
+          console.log("not found in cart");
+          cartItemInsertion(item, req, res, next).then(values => resolve(values)).catch(error =>reject(error))
         } else {
-          connection.query('INSERT INTO cart_items (product_id,user_id,size,quantity) VALUES (?,?,?,?)', [item.product_id, req.params.userId, item.size, item.quantity], function(error, results, fields) {
-            if (error) {
-              reject(error.sqlMessage)
-            } else {
-              resolve(true)
-            }
-          })
+          console.log("cart item already in cart.Updating");
+          cartItemUpdation(item, req, res, next).then(values => resolve(values)).catch(error =>reject(error))
         };
       }
     })
@@ -100,16 +95,24 @@ function cartItemUpdation(item, req, res, next) {
   return new Promise(function(resolve, reject) {
     connection.query('update cart_items SET size = ? , quantity = ? where user_id = ? and product_id = ?', [item.size, item.quantity,req.params.userId,item.product_id], function(error, results, fields) {
         if (error) reject(error)
-      else resolve(true)
+      else 
+      console.log("cart item updated");
+      resolve(true)
       })
     });
   }
 
-function multipleCartItemUpdation( req, res, next){
-    return new Promise(function(resolve, reject) {
-      let promiseArr = req.body.cartItems.map(item => cartItemUpdation(item, req, res, next))
-      Promise.all(promiseArr).then(values => resolve(values)).catch(error =>reject(error))
+function cartItemInsertion(item, req, res, next) {
+  return new Promise(function(resolve, reject) {
+    connection.query('INSERT INTO cart_items (product_id,user_id,size,quantity) VALUES (?,?,?,?)', [item.product_id, req.params.userId, item.size, item.quantity], function(error, results, fields) {
+      if (error) 
+        reject(error.sqlMessage)
+       else {
+        console.log("cart item inserted");
+        resolve(true)
+      }
     })
+    });
   }
 
 module.exports = router;
