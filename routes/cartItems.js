@@ -13,14 +13,12 @@ router.get('/:userId', (req, res, next) => {
   });
 });
 
-router.post('/:userId', userValidate, (req, res, next) => {
+router.post('/:userId', (req, res, next) => {
   multipleProductInCartValidation(req, res, next)
   .then(function(data) {
-    console.log("reached here");
     connection.query('SELECT sum(quantity) as cartCount FROM cart_items where user_id = ?', [req.params.userId], function(error, results, fields) {
       if (error) res.status(500).send(error.sqlMessage);
       else {
-        console.log(results);
         res.status(201).send(results);
       }
     });
@@ -32,7 +30,7 @@ router.post('/:userId', userValidate, (req, res, next) => {
   );
 });
 
-router.delete('/:userId/cart_id/:cartId',userValidate, (req,res,next) => {
+router.delete('/:userId/cart_id/:cartId', (req,res,next) => {
   connection.query('delete from cart_items where user_id = ?  and (cart_id = ? or ?  = 0)', [req.params.userId,req.params.cartId, req.params.cartId], function(error, results, fields) {
     if (error) res.status(500).send(error.sqlMessage);
     else {
@@ -75,15 +73,12 @@ function multipleProductInCartValidation(req, res, next){
 function productInCartValidate(item, req, res, next) {
   return new Promise(function(resolve, reject) {
     connection.query('SELECT * FROM cart_items where user_id = ? and product_id = ? and size = ?', [req.params.userId,item.product_id, item.size], function(error, product, fields) {
-      console.log("cart item checking");
       if (error) {
         reject(error.sqlMessage)
       } else {
         if (product.length == 0) {
-          console.log("not found in cart");
           cartItemInsertion(item, req, res, next).then(values => resolve(values)).catch(error =>reject(error))
         } else {
-          console.log("cart item already in cart.Updating");
           cartItemUpdation(item, req, res, next).then(values => resolve(values)).catch(error =>reject(error))
         };
       }
@@ -95,8 +90,7 @@ function cartItemUpdation(item, req, res, next) {
   return new Promise(function(resolve, reject) {
     connection.query('update cart_items SET size = ? , quantity = ? where user_id = ? and product_id = ?', [item.size, item.quantity,req.params.userId,item.product_id], function(error, results, fields) {
         if (error) reject(error)
-      else 
-      console.log("cart item updated");
+      else
       resolve(true)
       })
     });
@@ -108,7 +102,6 @@ function cartItemInsertion(item, req, res, next) {
       if (error) 
         reject(error.sqlMessage)
        else {
-        console.log("cart item inserted");
         resolve(true)
       }
     })
