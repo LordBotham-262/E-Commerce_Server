@@ -16,7 +16,7 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 
-var connection = require('./database/serverConnector');
+//var connection = require('./database/serverConnector');
 
 const productRoutes = require('./routes/products');
 const productTypesRoutes = require('./routes/product_types');
@@ -45,8 +45,5 @@ app.use((error,req,res,next) =>{
   });
 });
 
-app.listen(process.env.PORT || 3000, function() {
-  console.log("Server started on port 3000");
-});
 
-//connection.end();
+module.exports = app;

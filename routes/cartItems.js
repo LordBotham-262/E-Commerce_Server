@@ -46,22 +46,10 @@ router.delete('/:userId/cart_id/:cartId', (req,res,next) => {
   });
 });
 
-function userValidate(req, res, next) {
-  connection.query('SELECT * from user where id = ?', [req.params.userId], function(error, user, fields) {
-    if (error) {
-      res.status(500).json({
-        message: error.sqlMessage
-      });
 
-    } else {
-      if (user.length == 0) {
-        res.status(404).json({
-          message: 'User not found with ID ' + req.params.userId
-        });
-      } else next();
-    }
-  })
-}
+router.put('/userId',(req,res,next) => {
+  
+})
 
 function multipleProductInCartValidation(req, res, next){
  return new Promise(function(resolve, reject) {
