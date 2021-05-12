@@ -1,19 +1,31 @@
 const express = require("express");
 const router = express.Router();
-var connection = require('./../database/serverConnector');
+const mongoose = require("mongoose");
 
-router.get('/category_id/:categoryId/product_id/:productId', (req, res, next) => {
-  connection.query('select * from product where (id = ? or ? = 0) and (category = ? or ?  = 0 )', [req.params.productId, req.params.productId, req.params.categoryId, req.params.categoryId], function(error, results, fields) {
-      if (error) {
-      res.status(500).json([{
-        message: error.sqlMessage
-      }]);
-    }
-    else {
-      console.log("Query made for category type " + req.params.categoryId + " & product_type " + req.params.productId);
-      res.status(200).send(results);
-    }
-  });
+const Product = require("../models/product");
+
+//@desc get products from DB
+//@route = GET /api/products
+//@query = categoryId or productId or null
+
+router.get('/', (req, res, next) => {
+  productId = req.query.productId
+  catId = req.query.categoryId
+
+if(productId){queryFilter = {_id : productId}} else if (catId){queryFilter = {catId: catId }} else queryFilter = {};
+
+  Product.find(queryFilter)
+    .exec()
+    .then(docs => {
+        res.status(200).send(docs);
+    })
+    .catch(error =>{
+        console.log(error);
+        res.status(400).send(error);
+    })
 });
 
 module.exports = router;
+
+
+
