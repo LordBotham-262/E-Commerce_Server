@@ -1,111 +1,66 @@
 const express = require("express");
-const app = express();
 const router = express.Router();
-var connection = require('./../database/serverConnector');
+const mongoose = require("mongoose");
+const CartItem = require("../models/cartItem");
+const Product = require("../models/product");
 
-router.get('/:userId', (req, res, next) => {
-  connection.query('SELECT * FROM cart_items AS c INNER JOIN product AS p ON c.product_id = p.id WHERE user_id = ?', [req.params.userId], function(error, results, fields) {
-    if (error) res.status(500).send(error.sqlMessage);
-    else {
-      console.log("Query made for cart of user " + req.params.userId);
-      res.status(200).send(results);
-    }
-  });
-});
+//@desc GET cart Items from DB
+//@route = GET /api/cart
+//@query = userId or cartId
 
-router.post('/:userId', (req, res, next) => {
-  multipleProductInCartValidation(req, res, next)
-  .then(function(data) {
-    connection.query('SELECT sum(quantity) as cartCount FROM cart_items where user_id = ?', [req.params.userId], function(error, results, fields) {
-      if (error) res.status(500).send(error.sqlMessage);
-      else {
-        res.status(201).send(results);
-      }
-    });
-  })
-  .catch(error =>
-    res.status(500).json({
-      message: error
+router.get("/", (req, res, next) => {
+  if (req.query.cartId) {
+    queryFilter = { _id: req.query.cartId };
+  } else {
+    queryFilter = { user: req.query.userId };
+  }
+  CartItem.find(queryFilter)
+    .exec()
+    .then((docs) => {
+      res.status(200).send(docs);
     })
-  );
+    .catch((error) => {
+      res.status(400).send(error.message);
+    });
 });
 
-router.delete('/:userId/cart_id/:cartId', (req,res,next) => {
-  connection.query('delete from cart_items where user_id = ?  and (cart_id = ? or ?  = 0)', [req.params.userId,req.params.cartId, req.params.cartId], function(error, results, fields) {
-    if (error) res.status(500).send(error.sqlMessage);
-    else {
-      console.log("Item " + req.params.cartId +" deleted from cart for User" + req.params.userId);
-      connection.query('SELECT sum(quantity) as cartCount FROM cart_items where user_id = ?', [req.params.userId], function(error, results, fields) {
-        if (error) res.status(500).send(error.sqlMessage);
-        else {
-          console.log(results);
-          res.status(200).send(results);
-        }
+//@desc POST cartItem to DB
+//@route = POST /api/cart
+
+router.post("/", (req, res, next) => {
+  Product.findById(req.body.product)
+    .then((product) => {
+      console.log(product)
+      if (!product) throw(new Error("Product not Found"))
+      const cartItem = new CartItem({
+        _id: new mongoose.Types.ObjectId(),
+        product: req.body.product,
+        quantity: req.body.quantity,
+        size: req.body.sizeas,
+        color: req.body.color,
+        user: req.body.userId,
       });
-    }
-  });
-});
-
-function userValidate(req, res, next) {
-  connection.query('SELECT * from user where id = ?', [req.params.userId], function(error, user, fields) {
-    if (error) {
+      return cartItem.save();
+    })
+    .then((result) => {
+      res.status(201).json({
+        message: "Item added to cart successfully",
+        createdProductType: {
+          name: result.name,
+          _id: result._id,
+          request: {
+            type: "GET",
+            url: "http://localhost:3000/cart?cartId=" + result._id,
+          },
+        },
+      });
+    })
+    .catch((err) => {
+      //console.log(err);
       res.status(500).json({
-        message: error.sqlMessage
+        error: err.message,
       });
-
-    } else {
-      if (user.length == 0) {
-        res.status(404).json({
-          message: 'User not found with ID ' + req.params.userId
-        });
-      } else next();
-    }
-  })
-}
-
-function multipleProductInCartValidation(req, res, next){
- return new Promise(function(resolve, reject) {
-   let promiseArr = req.body.cartItems.map(item => productInCartValidate(item, req, res, next))
-   Promise.all(promiseArr).then(values => resolve(values)).catch(error =>reject(error))
- }
- )}
-
-function productInCartValidate(item, req, res, next) {
-  return new Promise(function(resolve, reject) {
-    connection.query('SELECT * FROM cart_items where user_id = ? and product_id = ? and size = ?', [req.params.userId,item.product_id, item.size], function(error, product, fields) {
-      if (error) {
-        reject(error.sqlMessage)
-      } else {
-        if (product.length == 0) {
-          cartItemInsertion(item, req, res, next).then(values => resolve(values)).catch(error =>reject(error))
-        } else {
-          cartItemUpdation(item, req, res, next).then(values => resolve(values)).catch(error =>reject(error))
-        };
-      }
-    })
-  });
-}
-
-function cartItemUpdation(item, req, res, next) {
-  return new Promise(function(resolve, reject) {
-    connection.query('update cart_items SET size = ? , quantity = ? where user_id = ? and product_id = ?', [item.size, item.quantity,req.params.userId,item.product_id], function(error, results, fields) {
-        if (error) reject(error)
-      else
-      resolve(true)
-      })
     });
-  }
-
-function cartItemInsertion(item, req, res, next) {
-  return new Promise(function(resolve, reject) {
-    connection.query('INSERT INTO cart_items (product_id,user_id,size,quantity) VALUES (?,?,?,?)', [item.product_id, req.params.userId, item.size, item.quantity], function(error, results, fields) {
-      if (error) 
-        reject(error.sqlMessage)
-       else {
-        resolve(true)
-      }
-    })
-    });
-  }
+});
 
 module.exports = router;

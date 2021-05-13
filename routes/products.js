@@ -20,8 +20,7 @@ if(productId){queryFilter = {_id : productId}} else if (catId){queryFilter = {ca
         res.status(200).send(docs);
     })
     .catch(error =>{
-        console.log(error);
-        res.status(400).send(error);
+        res.status(400).send(error.message,);
     })
 });
 

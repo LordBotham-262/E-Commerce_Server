@@ -2,20 +2,20 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require('mongoose');
 const ProductType = require("../models/productType");
+const Product = require("../models/product");
 
 //@desc GET productType from DB
 //@route = GET /api/product_type
-//@query = categoryId or productId or null
 
 router.get('/', (req, res, next) => {
-  ProductType.find()
+  if(req.query.catId){queryFilter = {_id : req.query.catId}} else {queryFilter={}}
+  ProductType.find(queryFilter)
     .exec()
     .then(docs => {
         res.status(200).send(docs);
     })
     .catch(error =>{
-        console.log(error);
-        res.status(400).send(error);
+        res.status(400).send(error.message,);
     })
 });
 
@@ -37,15 +37,14 @@ router.post('/', (req, res, next) => {
           _id: result._id,
           request: {
               type: 'GET',
-              url: "http://localhost:3000/product_type/" + result._id
+              url: "http://localhost:3000/product_type?catId=" + result._id
           }
       }
     });
   })
   .catch(err => {
-    console.log(err);
     res.status(500).json({
-      error: err
+      error: err.message,
     });
   });
 });

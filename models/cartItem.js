@@ -4,18 +4,21 @@ const cartItemSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     product : {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product'
+        ref: 'Product',
+        required: true
     },
-    quantity : Number,
+    quantity : { type: Number, default: 1 },
     size : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : 'Size'
+        ref : 'Size',
+        required: true
     },
     color : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : 'Color'
+        ref : 'Color',
+        required: true
     },
-    user : String
+    user : { type: String, required: true }
 });
 
-module.exports = mongoose.model('ProductType',productTypeSchema);
+module.exports = mongoose.model('CartItem',cartItemSchema);

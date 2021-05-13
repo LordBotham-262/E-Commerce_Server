@@ -22,6 +22,8 @@ app.use(express.json());
 const productRoutes = require('./routes/products');
 const productTypesRoutes = require('./routes/product_types');
 const cartItemsRoutes = require('./routes/cartItems');
+const colorRoutes = require('./routes/dataSeeders/colors');
+const sizeRoutes = require('./routes/dataSeeders/size');
 
 app.get('/',(req, res, next) => {
   res.send("Hello world");
@@ -29,7 +31,9 @@ app.get('/',(req, res, next) => {
 
 app.use('/products',productRoutes);
 app.use('/product_type',productTypesRoutes);
-app.use('/cart/user_id',cartItemsRoutes);
+app.use('/cart',cartItemsRoutes);
+app.use('/color',colorRoutes);
+app.use('/size',sizeRoutes);
 
 app.use((req,res,next) => {
   const error = new Error('404 Not Found');
