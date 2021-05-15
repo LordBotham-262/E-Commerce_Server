@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const cartItemSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    product : {
+    productId : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
         required: true
@@ -18,7 +18,7 @@ const cartItemSchema = mongoose.Schema({
         ref : 'Color',
         required: true
     },
-    user : { type: String, required: true }
+    userId : { type: String, required: true }
 });
 
 module.exports = mongoose.model('CartItem',cartItemSchema);

@@ -2,9 +2,7 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-var _ = require('lodash');
 const connectDB = require('./config/db')
-
 
 connectDB();
 
@@ -19,11 +17,12 @@ app.use(express.urlencoded({
 app.use(express.json());
 
 
-const productRoutes = require('./routes/products');
-const productTypesRoutes = require('./routes/product_types');
-const cartItemsRoutes = require('./routes/cartItems');
-const colorRoutes = require('./routes/dataSeeders/colors');
-const sizeRoutes = require('./routes/dataSeeders/size');
+const productRoutes = require('./api/routes/products');
+const productTypesRoutes = require('./api/routes/product_types');
+const cartItemsRoutes = require('./api/routes/cartItems');
+const colorRoutes = require('./api/routes/dataSeeders/colors');
+const sizeRoutes = require('./api/routes/dataSeeders/size');
+const userRoutes = require('./api/routes/users')
 
 app.get('/',(req, res, next) => {
   res.send("Hello world");
@@ -34,6 +33,7 @@ app.use('/product_type',productTypesRoutes);
 app.use('/cart',cartItemsRoutes);
 app.use('/color',colorRoutes);
 app.use('/size',sizeRoutes);
+app.use('/user',userRoutes);
 
 app.use((req,res,next) => {
   const error = new Error('404 Not Found');
