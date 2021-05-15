@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 require("dotenv").config();
+const checkAuth = require("../middleware/checkAuth")
 
 router.post("/signup", (req, res, next) => {
   User.find({ email: req.body.email })
@@ -84,7 +85,7 @@ router.post("/login", (req, res, next) => {
     });
 });
 
-router.delete("/", (req, res, next) => {
+router.delete("/",checkAuth, (req, res, next) => {
   User.deleteOne({ _id: req.query.id })
     .exec()
     .then((result) => {

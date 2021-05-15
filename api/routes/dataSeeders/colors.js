@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Color = require("../../models/color");
+const checkAuth = require("../../middleware/checkAuth")
 
 //@desc GET Colors from DB
 //@route = GET /api/color
@@ -22,7 +23,7 @@ router.get("/", (req, res, next) => {
 //@desc POST Colors to DB
 //@route = POST /api/color
 
-router.post("/", (req, res, next) => {
+router.post("/",checkAuth, (req, res, next) => {
   const color = new Color({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
