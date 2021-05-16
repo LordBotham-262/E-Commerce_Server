@@ -42,14 +42,14 @@ exports.cartItem_postOne = (req, res, next) => {
             { userId: cartItem.userId },
           ],
         },
-        {quantity : cartItem.quantity},
-        {upsert : true}
-       )
-      })
+        { quantity: cartItem.quantity },
+        { upsert: true }
+      );
+    })
     .then((result) => {
-        res.status(201).json({
-          message: "Item added to cart successfully",
-        });
+      res.status(201).json({
+        message: "Item added to cart successfully",
+      });
     })
     .catch((err) => {
       res.status(500).json({

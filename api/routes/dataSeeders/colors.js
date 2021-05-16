@@ -2,14 +2,18 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Color = require("../../models/color");
-const checkAuth = require("../../middleware/checkAuth")
+const checkAuth = require("../../middleware/checkAuth");
 
 //@desc GET Colors from DB
 //@route = GET /api/color
 //@query = colorId or name
 
 router.get("/", (req, res, next) => {
-  if(req.query.colorId){queryFilter = { _id: req.query.colorId }}else {queryFilter = {}}
+  if (req.query.colorId) {
+    queryFilter = { _id: req.query.colorId };
+  } else {
+    queryFilter = {};
+  }
   Color.find(queryFilter)
     .exec()
     .then((docs) => {
@@ -23,7 +27,7 @@ router.get("/", (req, res, next) => {
 //@desc POST Colors to DB
 //@route = POST /api/color
 
-router.post("/",checkAuth, (req, res, next) => {
+router.post("/", checkAuth, (req, res, next) => {
   const color = new Color({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
