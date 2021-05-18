@@ -11,10 +11,14 @@ exports.cartItem_getAll = (req, res, next) => {
   CartItem.find(queryFilter)
     .exec()
     .then((docs) => {
-      res.status(200).send(docs);
+      res.status(200).json({
+        documents: docs,
+      });
     })
-    .catch((error) => {
-      res.status(400).send(error.message);
+    .catch((err) => {
+      res.status(500).json({
+        error: err.message,
+      });
     });
 };
 
@@ -22,15 +26,18 @@ exports.cartItem_postOne = (req, res, next) => {
   Product.findById(req.body.productId)
     .then((product) => {
       if (!product) throw new Error("Product not Found");
+
       const cartItem = new CartItem({
         _id: new mongoose.Types.ObjectId(),
         productId: req.body.productId,
         quantity: req.body.quantity,
         size: req.body.size,
         color: req.body.color,
-        userId: req.body.userId,
+        userId: req.query.userId,
       });
-      return cartItem;
+      const validatedModel = cartItem.validateSync();
+      if (!!validatedModel) throw validatedModel;
+      else return cartItem;
     })
     .then((cartItem) => {
       return CartItem.updateOne(
@@ -75,7 +82,30 @@ exports.cartitem_delete = (req, res, next) => {
         message: "Cart Item deleted",
       });
     })
-    .catch((error) => {
-      res.status(400).send(error.message);
+    .catch((err) => {
+      res.status(500).json({
+        error: err.message,
+      });
     });
 };
+
+exports.cartitem_getCount = (req,res,next) => {
+  CartItem.aggregate([
+    { $match: { "userId":  mongoose.Types.ObjectId(req.query.userId) }},
+    {$group: {
+      _id : req.query.userId,
+      cartCount : {$sum : "$quantity" }
+    }
+  }
+]).then((docs) => {
+    res.status(200).json({
+      message: docs,
+    });
+  }
+
+  ).catch((err) => {
+    res.status(500).json({
+      error: err.message,
+    });
+  })
+}

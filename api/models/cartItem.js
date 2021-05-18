@@ -18,7 +18,7 @@ const cartItemSchema = mongoose.Schema({
     ref: "Color",
     required: true,
   },
-  userId: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 });
 
 module.exports = mongoose.model("CartItem", cartItemSchema);

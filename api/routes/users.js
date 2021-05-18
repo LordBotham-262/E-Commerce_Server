@@ -21,4 +21,6 @@ router.delete("/", checkAuth, UserController.deleteUser);
 //@route = GET /api/signOut
 router.post("/signout", checkAuth, UserController.signout);
 
+//router.post('/resetPassword',checkAuth,UserController.resetPassword);
+
 module.exports = router;

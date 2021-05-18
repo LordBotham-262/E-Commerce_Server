@@ -39,7 +39,9 @@ exports.productType_getAll = (req, res, next) => {
     .then((docs) => {
       res.status(200).send(docs);
     })
-    .catch((error) => {
-      res.status(400).send(error.message);
+    .catch((err) => {
+      res.status(500).json({
+        error: err.message,
+      });
     });
 };

@@ -98,11 +98,11 @@ exports.deleteUser = (req, res, next) => {
     });
 };
 
-exports.signout = async (req, res, next) => {
+exports.signout = (req, res, next) => {
   try {
     let randomNumberToAppend = toString(Math.floor(Math.random() * 1000 + 1));
     let randomIndex = Math.floor(Math.random() * 10 + 1);
-    let hashedRandomNumberToAppend = await bcrypt.hash(
+    let hashedRandomNumberToAppend = bcrypt.hash(
       randomNumberToAppend,
       10
     );
@@ -115,8 +115,35 @@ exports.signout = async (req, res, next) => {
       token: token,
     });
   } catch (error) {
-    return res.status(401).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
+
+exports.resetPassword = (req,res,next) => {
+  User.findOne({email : req.body.email})
+  .exec()
+  .then(user =>{
+      let randomNumberToAppend = toString(Math.floor(Math.random() * 1000 + 1));
+      let randomIndex = Math.floor(Math.random() * 10 + 1);
+      let hashedRandomNumberToAppend = bcrypt.hash(
+        randomNumberToAppend,
+        10
+      );
+  
+      // now just concat the hashed random number to the end of the token
+      const password =  hashedRandomNumberToAppend;
+      
+      return res.status(200).json({
+        message: "New passWord",
+        password: password,
+      });
+    })
+    .catch(error => {
+      return res.status(500).json({
+        message: error.message,
+      });
+    })
+}
+

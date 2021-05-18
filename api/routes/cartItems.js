@@ -18,4 +18,9 @@ router.post("/", checkAuth, CartItemController.cartItem_postOne);
 //query = userID or cartID
 router.delete("/", checkAuth, CartItemController.cartitem_delete);
 
+//@desc GET cartCount from DB
+//@route = GET api/cart
+//query = userID
+router.get("/getCount",CartItemController.cartitem_getCount);
+
 module.exports = router;

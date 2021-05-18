@@ -5,7 +5,7 @@ const productSchema = mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   rating: { type: Number, default: 0 },
-  imageId: { type: String, required: true },
+  imagePath: { type: String, required: true },
   catId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "ProductType",
