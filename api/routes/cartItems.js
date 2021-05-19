@@ -11,6 +11,7 @@ router.get("/", checkAuth, CartItemController.cartItem_getAll);
 
 //@desc POST cartItem to DB
 //@route = POST /api/cart
+//query = userID
 router.post("/", checkAuth, CartItemController.cartItem_postOne);
 
 //@desc DELETE cartItem from DB
