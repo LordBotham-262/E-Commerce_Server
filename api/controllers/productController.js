@@ -1,4 +1,3 @@
-const { json } = require("body-parser");
 const mongoose = require("mongoose");
 
 const Product = require("../models/product");
@@ -49,59 +48,74 @@ exports.products_addProduct = (req, res, next) => {
 
 exports.products_addVariation = (req, res, next) => {
   const data = req.body;
-  try {
-    data.forEach((product) => {
-      Product.findOneAndUpdate(
-        {
-          _id: req.query.productId
+  var query_newData = {
+    _id: req.query.productId,
+    variations: {
+      $not: {
+        $elemMatch: {
+          size: data.size,
+          color: data.color,
         },
-        { $push: { variations : product }},
-        { 
-          arrayFilters: [{variations : {$elemMatch : { "color" : product.color , "size " : product.size}}}],
-          new: true
-        }
-        //{'new': true, 'safe': true, 'upsert': true }
-      )
-        .then((docs) => {
-          res.status(201).json({
-            message: docs,
-          });
-        })
-        .catch((err) => {
-          res.status(500).json({
-            message: err.message,
-          });
-        });
-    });
-  } catch {
-    (err) => {
+      },
+    },
+  };
+  var update_newData = { $addToSet: { variations: data } };
+  var query = {
+    _id: req.query.productId,
+    "variations.size": data.size,
+    "variations.color": data.color,
+  };
+  var update = { $set: { "variations.$": data } };
+
+  Product.updateOne(query_newData, update_newData, { new: true })
+    .then((result) => {
+      if (result.nModified === 0) {
+        return Product.updateOne(query, update, { new: true });
+      } else return result;
+    })
+    .then((docs) => {
+      res.status(201).json({
+        message: "Variation added to Product Data",
+      });
+    })
+    .catch((err) => {
       res.status(500).json({
         message: err.message,
       });
-    };
-  }
+    });
 };
 
-// Product.updateOne(
-//   { _id: req.query.productId },
-//   )
-//   .then((docs) => {
-//     res.status(201).json({
-//       message: docs,
-//     });
-//   })
-//   .catch((err) => {
-//     res.status(500).json({
-//       message: err.message,
-//     });
-//   });
+exports.products_deleteVariation = (req,res,next) => {
+  if(req.query.variationId) {
+    query = {'variations._id' : req.query.variationId}
+  } else {
+    return res.status(500).json({
+      error: "Query is empty",
+    });
+  }
+  Product.updateOne(query,{$pull : {variations : {_id : req.query.variationId}}})
+  .then((docs) => {
+    res.status(201).json({
+      message: "Variation removed from Product",
+    });
+  })
+  .catch((err) => {
+    res.status(500).json({
+      message: err.message,
+    });
+  });
+}; 
 
-// variations: [
-//   {
-//     size: ,
-//     color: ,
-//     stock: ,
-//     price: ,
-//     imageId: ,
-//   },
-// ],
+exports.products_deleteProduct = (req,res,next) => {
+  Product.remove({_id : requestAnimationFrame.query.productId})
+  .then((docs) => {
+    res.status(201).json({
+      message: "Variation removed from Product",
+    });
+  })
+  .catch((err) => {
+    res.status(500).json({
+      message: err.message,
+    });
+  });
+};

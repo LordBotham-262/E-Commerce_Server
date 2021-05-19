@@ -15,6 +15,7 @@ router.post("/login", UserController.userLogin);
 
 //@desc Delete an User
 //@route = GET /api/delete
+//@query = userId
 router.delete("/", checkAuth, UserController.deleteUser);
 
 //@desc signOut an User

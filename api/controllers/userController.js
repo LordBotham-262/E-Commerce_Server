@@ -83,7 +83,15 @@ exports.userSignUp = (req, res, next) => {
 };
 
 exports.deleteUser = (req, res, next) => {
-  User.deleteOne({ _id: req.query.id })
+  if(req.query.id){
+    query = { _id: req.query.id }
+  }
+  else {
+    return res.status(500).json({
+      error: "Query is empty",
+    });
+  }
+  User.deleteOne(query)
     .exec()
     .then((result) => {
       res.status(200).json({

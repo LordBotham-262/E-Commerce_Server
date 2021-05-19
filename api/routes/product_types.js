@@ -6,6 +6,7 @@ const ProducTypeController = require("../controllers/productTypeController");
 
 //@desc GET productType from DB
 //@route = GET /api/product_type
+//@query = categoryId or null
 router.get("/", ProducTypeController.productType_getAll);
 
 //@desc POST productType to DB

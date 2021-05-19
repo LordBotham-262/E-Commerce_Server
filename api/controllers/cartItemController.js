@@ -5,8 +5,12 @@ const mongoose = require("mongoose");
 exports.cartItem_getAll = (req, res, next) => {
   if (req.query.cartId) {
     queryFilter = { _id: req.query.cartId };
-  } else {
+  } else if (req.query.userId) {
     queryFilter = { userId: req.query.userId };
+  } else {
+    return res.status(500).json({
+      error: "Query is empty",
+    });
   }
   CartItem.find(queryFilter)
     .exec()
@@ -23,6 +27,11 @@ exports.cartItem_getAll = (req, res, next) => {
 };
 
 exports.cartItem_postOne = (req, res, next) => {
+  if(!req.query.userId){
+    return res.status(500).json({
+      error: "Query is empty",
+    });
+  }
   Product.findById(req.body.productId)
     .then((product) => {
       if (!product) throw new Error("Product not Found");
@@ -89,23 +98,31 @@ exports.cartitem_delete = (req, res, next) => {
     });
 };
 
-exports.cartitem_getCount = (req,res,next) => {
+exports.cartitem_getCount = (req, res, next) => {
+  if (req.query.userId) {
+    queryFilter = { userId: mongoose.Types.ObjectId(req.query.userId )};
+  } else {
+    return res.status(500).json({
+      error: "Query is empty",
+    });
+  }
   CartItem.aggregate([
-    { $match: { "userId":  mongoose.Types.ObjectId(req.query.userId) }},
-    {$group: {
-      _id : req.query.userId,
-      cartCount : {$sum : "$quantity" }
-    }
-  }
-]).then((docs) => {
-    res.status(200).json({
-      message: docs,
+    { $match: { queryFilter } },
+    {
+      $group: {
+        _id: req.query.userId,
+        cartCount: { $sum: "$quantity" },
+      },
+    },
+  ])
+    .then((docs) => {
+      res.status(200).json({
+        message: docs,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.message,
+      });
     });
-  }
-
-  ).catch((err) => {
-    res.status(500).json({
-      error: err.message,
-    });
-  })
-}
+};

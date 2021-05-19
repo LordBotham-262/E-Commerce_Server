@@ -1,6 +1,24 @@
 const mongoose = require("mongoose");
 const ProductType = require("../models/productType");
 
+exports.productType_getAll = (req, res, next) => {
+  if (req.query.catId) {
+    queryFilter = { _id: req.query.catId };
+  } else {
+    queryFilter = {};
+  }
+  ProductType.find(queryFilter)
+    .exec()
+    .then((docs) => {
+      res.status(200).send(docs);
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.message,
+      });
+    });
+};
+
 exports.productType_postCategory = (req, res, next) => {
   const productType = new ProductType({
     _id: new mongoose.Types.ObjectId(),
@@ -28,20 +46,4 @@ exports.productType_postCategory = (req, res, next) => {
     });
 };
 
-exports.productType_getAll = (req, res, next) => {
-  if (req.query.catId) {
-    queryFilter = { _id: req.query.catId };
-  } else {
-    queryFilter = {};
-  }
-  ProductType.find(queryFilter)
-    .exec()
-    .then((docs) => {
-      res.status(200).send(docs);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        error: err.message,
-      });
-    });
-};
+
