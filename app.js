@@ -26,6 +26,7 @@ const cartItemsRoutes = require("./api/routes/cartItems");
 const colorRoutes = require("./api/routes/dataSeeders/colors");
 const sizeRoutes = require("./api/routes/dataSeeders/size");
 const userRoutes = require("./api/routes/users");
+const orderRoutes = require("./api/routes/orders");
 
 app.get("/", (req, res, next) => {
   res.send("Hello world");
@@ -37,6 +38,7 @@ app.use("/cart", cartItemsRoutes);
 app.use("/color", colorRoutes);
 app.use("/size", sizeRoutes);
 app.use("/user", userRoutes);
+app.use("/order", orderRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("404 Not Found");

@@ -8,7 +8,7 @@ exports.cartItem_getAll = (req, res, next) => {
   } else if (req.query.userId) {
     queryFilter = { userId: req.query.userId };
   } else {
-    return res.status(500).json({
+    return res.status(400).json({
       error: "Query is empty",
     });
   }
@@ -28,7 +28,7 @@ exports.cartItem_getAll = (req, res, next) => {
 
 exports.cartItem_postOne = (req, res, next) => {
   if(!req.query.userId){
-    return res.status(500).json({
+    return res.status(400).json({
       error: "Query is empty",
     });
   }
@@ -80,7 +80,7 @@ exports.cartitem_delete = (req, res, next) => {
   } else if (req.query.userId) {
     queryFilter = { userId: req.query.userId };
   } else {
-    return res.status(500).json({
+    return res.status(400).json({
       error: "Query is empty",
     });
   }
