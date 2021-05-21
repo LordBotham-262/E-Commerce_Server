@@ -4,7 +4,6 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
-var _ = require('lodash');
 
 app.use(bodyParser.urlencoded({
   extended: true
