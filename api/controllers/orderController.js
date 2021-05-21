@@ -32,11 +32,17 @@ exports.Order_createOrder = (req, res, next) => {
       message: "Query is Empty",
     });
   }
+console.log(req.body.products)
+  if ((req.body).length < 1){
+    return res.status(400).json({
+      message: "No products found in Cart",
+    });
+  }
 
   const order = new Order({
-    _id: new mongoose.Mongoose.Types.ObjectId(),
+    _id: new mongoose.Types.ObjectId(),
     userId: req.query.userId,
-    products: req.body.products,
+    products: req.body,
     activeStatus: true,
   });
   order

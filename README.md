@@ -26,6 +26,12 @@ Install dependencies:
 $ npm install
 ```
 
+Create an .env file and save the enviroment variables:
+```bash
+// mongoDB settings
+MONGO_URL = ''
+JWT_KEY = ''
+```
 
 
 MIT License
