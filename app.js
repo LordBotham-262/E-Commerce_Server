@@ -22,7 +22,7 @@ app.use(express.json());
 
 const productRoutes = require("./api/routes/products");
 const productTypesRoutes = require("./api/routes/product_types");
-const cartItemsRoutes = require("./api/routes/cartItems");
+const CartRoutes = require("./api/routes/cart");
 const colorRoutes = require("./api/routes/dataSeeders/colors");
 const sizeRoutes = require("./api/routes/dataSeeders/size");
 const userRoutes = require("./api/routes/users");
@@ -34,7 +34,7 @@ app.get("/", (req, res, next) => {
 
 app.use("/products", productRoutes);
 app.use("/product_type", productTypesRoutes);
-app.use("/cart", cartItemsRoutes);
+app.use("/cart", CartRoutes);
 app.use("/color", colorRoutes);
 app.use("/size", sizeRoutes);
 app.use("/user", userRoutes);
@@ -54,5 +54,9 @@ app.use((error, req, res, next) => {
     },
   });
 });
+
+
+
+
 
 module.exports = app;

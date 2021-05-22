@@ -21,11 +21,12 @@ const orderSchema = mongoose.Schema({
   status: {
     type: [{
       type: String,
-      enum: ['pending', 'accepted', 'completed']
+      enum: ['pending', 'accepted', 'completed','cancelled']
     }],
     default: ['pending']
   }
-});
+},
+);
 
 orderSchema.set('timestamps', true);
 

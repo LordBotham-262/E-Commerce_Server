@@ -4,7 +4,10 @@
 
 ## Goal
 
-TO DO
+Goal of the repo was to work as a backend server for the Flutter App. Initially the Backend used MySql as the database.Now the BackEnd server is forked into two different servers , MongoDB and MySQL. Please find code for concerned database in respective Branch.
+
+## TO DO
+
 - [x] create API for products,productTypes and cartItems
 - [x] authentication added and checkAuth middleware added to critical API
 - [x] segregate Controllers
@@ -12,7 +15,7 @@ TO DO
 - [ ] Reset password APIs/Logic
 - [x] support to add & delete variants as well as products 
 - [ ] adding user Roles
-- [ ] Order table with APIs
+- [x] Order table with APIs
 
 
 
@@ -32,8 +35,13 @@ Create an .env file and save the enviroment variables:
 MONGO_URL = ''
 JWT_KEY = ''
 ```
+Run the server using the follwoing command :
+
+```bash
+nodemon server.js
+```
 
 
-MIT License
+## [License: MIT](LICENSE.md)
 
 Copyright (c) 2021 Dhaval Patel
