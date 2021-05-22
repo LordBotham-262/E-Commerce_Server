@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Size = require("../../models/size");
 const checkAuth = require("../../middleware/checkAuth");
+const checkRole = require("../../middleware/checkRole");
 
 //@desc GET size from DB
 //@route = GET /api/size
@@ -27,7 +28,7 @@ router.get("/", (req, res, next) => {
 //@desc POST size to DB
 //@route = POST /api/size
 
-router.post("/", checkAuth, (req, res, next) => {
+router.post("/", checkAuth, checkRole, (req, res, next) => {
   const size = new Size({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,

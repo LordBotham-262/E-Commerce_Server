@@ -24,6 +24,7 @@ exports.userLogin = (req, res, next) => {
             {
               email: user.email,
               userId: user._id,
+              role : user.role
             },
             process.env.JWT_KEY,
             {
@@ -52,41 +53,35 @@ exports.userSignUp = (req, res, next) => {
     .exec()
     .then((user) => {
       if (user.length >= 1) {
-        return res.status(409).json({
-          message: "User Exists",
-        });
+        throw new Error("User Exists");
       } else {
-        bcrypt.hash(req.body.password, 10, function (err, hash) {
-          if (err) throw err;
-          else {
-            const user = new User({
-              _id: new mongoose.Types.ObjectId(),
-              email: req.body.email,
-              password: hash,
-            });
-            user
-              .save()
-              .then((result) => {
-                res.status(201).json({
-                  message: "User Created",
-                });
-              })
-              .catch((err) => {
-                res.status(500).json({
-                  error: err.message,
-                });
-              });
-          }
-        });
+        return bcrypt.hash(req.body.password, 10);
       }
+    })
+    .then((hash) => {
+      const user = new User({
+        _id: new mongoose.Types.ObjectId(),
+        email: req.body.email,
+        password: hash,
+      });
+      return user.save();
+    })
+    .then((result) => {
+      res.status(201).json({
+        message: "User Created",
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.message,
+      });
     });
 };
 
 exports.deleteUser = (req, res, next) => {
-  if(req.query.id){
-    query = { _id: req.query.id }
-  }
-  else {
+  if (req.query.id) {
+    query = { _id: req.query.id };
+  } else {
     return res.status(500).json({
       error: "Query is empty",
     });
@@ -110,10 +105,7 @@ exports.signout = (req, res, next) => {
   try {
     let randomNumberToAppend = toString(Math.floor(Math.random() * 1000 + 1));
     let randomIndex = Math.floor(Math.random() * 10 + 1);
-    let hashedRandomNumberToAppend = bcrypt.hash(
-      randomNumberToAppend,
-      10
-    );
+    let hashedRandomNumberToAppend = bcrypt.hash(randomNumberToAppend, 10);
 
     // now just concat the hashed random number to the end of the token
     const token =
@@ -129,29 +121,25 @@ exports.signout = (req, res, next) => {
   }
 };
 
-exports.resetPassword = (req,res,next) => {
-  User.findOne({email : req.body.email})
-  .exec()
-  .then(user =>{
+exports.resetPassword = (req, res, next) => {
+  User.findOne({ email: req.body.email })
+    .exec()
+    .then((user) => {
       let randomNumberToAppend = toString(Math.floor(Math.random() * 1000 + 1));
       let randomIndex = Math.floor(Math.random() * 10 + 1);
-      let hashedRandomNumberToAppend = bcrypt.hash(
-        randomNumberToAppend,
-        10
-      );
-  
+      let hashedRandomNumberToAppend = bcrypt.hash(randomNumberToAppend, 10);
+
       // now just concat the hashed random number to the end of the token
-      const password =  hashedRandomNumberToAppend;
-      
+      const password = hashedRandomNumberToAppend;
+
       return res.status(200).json({
         message: "New passWord",
         password: password,
       });
     })
-    .catch(error => {
+    .catch((error) => {
       return res.status(500).json({
         message: error.message,
       });
-    })
-}
-
+    });
+};

@@ -12,22 +12,21 @@ router.get("/", CartController.Cart_getCart);
 //@desc GET cartCount from DB
 //@route = GET api/cart
 //query = userID or cartId
-router.get("/getCount",CartController.Cart_getCount);
+router.get("/getCount", checkAuth, CartController.Cart_getCount);
 
 //@desc POST Cart to db
 //@route = POST /api/cart
 //query = userId
-router.post("/", CartController.Cart_createCart);
+router.post("/", checkAuth, CartController.Cart_createCart);
 
 //@desc DELETE cart from db
 //@route = DELETE /api/cart
 //query = userId or cartId
-router.delete("/", CartController.Cart_deleteCart);
+router.delete("/", checkAuth, CartController.Cart_deleteCart);
 
 //@desc DELETE Cart from DB
 //@route = DELETE api/cartItem
 //query = CartItemID
-router.delete("/cartItem",  CartController.Cart_deleteItem);
-
+router.delete("/cartItem", checkAuth, CartController.Cart_deleteItem);
 
 module.exports = router;

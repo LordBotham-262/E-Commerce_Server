@@ -4,18 +4,19 @@
 
 ## Goal
 
-Goal of the repo was to work as a backend server for the Flutter App. Initially the Backend used MySql as the database.Now the BackEnd server is forked into two different servers , MongoDB and MySQL. Please find code for concerned database in respective Branch.
+Goal of the repo was to work as a backend server for the Flutter App. Initially the Backend used MySql as the database. Now the BackEnd server is segregated into two different servers , MongoDB and MySQL. Please find code for concerned database in respective Branch. User can use any one branch for development as both of them are standalone servers.
 
 ## TO DO
 
 - [x] create API for products,productTypes and cartItems
 - [x] authentication added and checkAuth middleware added to critical API
 - [x] segregate Controllers
-- [x] cartItem count API/Logic pending
+- [x] cartItem count API/Logic
 - [ ] Reset password APIs/Logic
 - [x] support to add & delete variants as well as products 
-- [ ] adding user Roles
-- [x] Order table with APIs
+- [x] adding user Roles
+- [x] Order collection with APIs
+- [ ] separate buyer and seller logic
 
 
 
@@ -40,7 +41,6 @@ Run the server using the follwoing command :
 ```bash
 nodemon server.js
 ```
-
 
 ## [License: MIT](LICENSE.md)
 
