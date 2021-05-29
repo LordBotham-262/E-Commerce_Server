@@ -63,6 +63,7 @@ exports.userSignUp = (req, res, next) => {
         _id: new mongoose.Types.ObjectId(),
         email: req.body.email,
         password: hash,
+        role: ['buyer'] 
       });
       return user.save();
     })
@@ -143,3 +144,5 @@ exports.resetPassword = (req, res, next) => {
       });
     });
 };
+
+

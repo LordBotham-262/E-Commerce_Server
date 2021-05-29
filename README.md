@@ -1,4 +1,5 @@
 # Patel Shop
+
  This branch focuses on NoSQL and uses mongoDB as its DB.
 
 
@@ -16,7 +17,7 @@ Goal of the repo was to work as a backend server for the Flutter App. Initially 
 - [x] support to add & delete variants as well as products 
 - [x] adding user Roles
 - [x] Order collection with APIs
-- [ ] separate buyer and seller logic
+- [x] separate buyer and seller logic
 
 
 
@@ -30,7 +31,8 @@ Install dependencies:
 $ npm install
 ```
 
-Create an .env file and save the enviroment variables:
+Create an .env file in the root folder and save the enviroment variables:
+
 ```bash
 // mongoDB settings
 MONGO_URL = ''
